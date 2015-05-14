@@ -1,6 +1,8 @@
 from p6_game import Simulator
 from heapq import heappush, heappop
 
+import p6_tool
+
 ANALYSIS = {}
 
 def analyze(design):
@@ -33,14 +35,23 @@ def analyze(design):
 			if state not in ANALYSIS:
 				ANALYSIS[state] = node
 				q.append(state)
-
+				
+	return ANALYSIS
 	# TODO: fill in this function, populating the ANALYSIS dict
 	#raise NotImplementedError
 
-def inspect((i,j), draw_line):
+def inspect(report, (i,j), draw_line):
 	#search the dict for every solution that starts with that pos, the build paths from each soltion back to the start
-	#Error: ANALYSIS is empty when called here despite analyze being called previously
-	print ANALYSIS
+	paths = []
+	for node in report:
+		if node[0] == (i, j):
+			currNode = node
+			offset = p6_tool.make_offset()
+			color = p6_tool.make_color()
+			while report[currNode] != None:
+				draw_line(currNode[0], report[currNode][0], offset, color)
+				currNode = report[currNode]
+			
 	# TODO: use ANALYSIS and (i,j) draw some lines
 
 	#raise NotImplementedError
