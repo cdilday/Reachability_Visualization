@@ -1,5 +1,9 @@
 from p6_game import Simulator
 from heapq import heappush, heappop
+try:
+    import Queue as Q  # ver. < 3.0
+except ImportError:
+    import queue as Q
 
 import p6_tool
 
@@ -12,11 +16,12 @@ def analyze(design):
 	#BFS
 	ANALYSIS = {init: None}
 
-	q = [init]
+	q = Q.PriorityQueue()
 
-	while q:
-		node = q.pop()
+	q.put((0, init[0], init[1]))
 
+	while not q.empty():
+		node = q.get()
 		#no goal state required as we're doing an exhaustive search
 
 		moves = sim.get_moves()
@@ -24,18 +29,19 @@ def analyze(design):
 		states = []
 		for move in moves:
 			#NONETYPE not iterable error
-			if sim.get_next_state(node, move) != None:
-				pos, abil = sim.get_next_state(node, move)
-				newState = (pos, abil)
-						
+			#print node
+			if sim.get_next_state((node[1],node[2]), move) != None:
+				pos, abil = sim.get_next_state((node[1],node[2]), move)
+				newState = (node[0] + 1, pos, abil)
 				states.append(newState)
 
 		#Use ANALYSIS like a prev dict, only each key now has states so the solution will be unique for each set of abilities
 		for state in states:
-			if state not in ANALYSIS:
-				ANALYSIS[state] = node
-				q.append(state)
-				
+			curr = (state[1],state[2])
+			if curr not in ANALYSIS:
+				ANALYSIS[curr] = (node[1],node[2])
+				q.put(state)
+		
 	return ANALYSIS
 	# TODO: fill in this function, populating the ANALYSIS dict
 	#raise NotImplementedError
